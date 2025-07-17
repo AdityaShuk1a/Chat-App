@@ -2,36 +2,41 @@ import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
+
+// SIGNUP CONTROLLER
 export const signup = async (req, res) => {
 
-    // console.log("signup route");
     const {fullName, email, password} = req.body
-
+    
     try {
-
+        
+        // ALL FIELDS REQUIRED
         if(!fullName || !email || !password) {
             return res.status(400).json({
                 message: "All fields are required"
             });
         }
 
+        // PASSWORD LENGTH
         if(password.length < 6) {
             return res.status(400).json({
                 message: "Password must be at least 6 characters long."
             });
         }
 
+        // IF USER ALREADY EXISTS
         const user = await User.findOne({email});
-
         if(user) {
             return res.status(400).json({
                 message: "Email already exists."
             });
         }
 
+        // PASSWORD HASHING
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        //NEW USER CREATION
         const newUser = new User({
             fullName: fullName,
             email: email,
@@ -65,11 +70,66 @@ export const signup = async (req, res) => {
 
 };
 
-export const login = (req, res) => {
-    console.log("login route");
+
+// LOGIN CONTROLLER
+export const login = async (req, res) => {
+    
+    const {email, password} = req.body;
+    
+    try {
+
+        // USER NOT FOUND
+        const user = await User.findOne({email});
+        if(!user) {
+            return res.status(400).json({
+                message: "Invalid Credentials"
+            });
+        }
+
+        // PASSWORD VALIDATION
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(!isPasswordValid){
+            return res.status(400).json({
+                message: "Invalid Credentials"
+            });
+        }
+
+        generateToken(user._id, res);
+
+        res.status(200).json({
+            _id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            profilePic: user.profilePic,
+        });
+
+    } catch(error) {
+        console.log("Error in login controller", error.message);
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+
 };
 
+
+// LOGOUT CONTROLLER
 export const logout = (req, res) => {
-    console.log("logout route");
+
+    try {
+
+        res.cookie("jwt", "", {maxAge: 0});
+
+        res.status(200).json({
+            message: "Logged Out Successfully"
+        });
+
+    } catch(error) {
+        console.log("Error in logout controller", error.message);
+        res.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
+
 };
 
