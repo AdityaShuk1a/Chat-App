@@ -13,7 +13,6 @@ const SignUpPage = () => {
     email: "",
     password: "",
   });
-
   const { signup, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
