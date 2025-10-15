@@ -12,11 +12,11 @@ const ProfilePage = () => {
 
     const reader = new FileReader();
 
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file); // Reading File meta data
 
     reader.onload = async () => {
-      const base64Image = reader.result;
-      setSelectedImg(base64Image);
+      const base64Image = reader.result; // Getting Base 64 file String
+      setSelectedImg(base64Image); 
       await updateProfile({ profilePic: base64Image });
     };
   };
