@@ -7,10 +7,12 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://chat-app-navy-sigma.vercel.app"],
+    origin: ["http://localhost:5173", "https://chat-app-niuv.onrender.com"],
     credentials: true,
   },
+  transports: ["websocket"],
 });
+
 
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
