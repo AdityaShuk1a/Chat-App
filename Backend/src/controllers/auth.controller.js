@@ -118,7 +118,8 @@ export const logout = (req, res) => {
 
     try {
 
-        res.cookie("jwt", "", {maxAge: 0});
+        // res.cookie("jwt", "", {maxAge: 0});
+        res.header("jwt", "");
 
         res.status(200).json({
             message: "Logged Out Successfully"
